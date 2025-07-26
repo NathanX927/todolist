@@ -217,3 +217,82 @@ li:hover .delete-btn { opacity: 1; }
     width: 80%;
     background-color: var(--accent-orange);
 }
+
+/* ======== 响应式设计：移动端优化 ======== */
+
+/* 当屏幕宽度小于等于 768px 时应用以下样式 */
+@media (max-width: 768px) {
+
+    /* 减小容器的内边距，给内容更多空间 */
+    .container {
+        padding: 20px 15px;
+        margin: 20px auto;
+    }
+
+    /* 调整标题字体大小 */
+    h1 {
+        font-size: 1.8em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+
+    /* 让预设区域的元素垂直堆叠，而不是并排 */
+    .preset-container {
+        flex-direction: column;
+        align-items: stretch; /* 让元素宽度撑满 */
+    }
+
+    /* 
+     * 核心修改：重新安排健身记录的每一行布局 
+     */
+    .set-row {
+        /* 从4列布局变为更灵活的2列布局 */
+        grid-template-columns: 1fr 1fr;
+        /* 增加行间距 */
+        row-gap: 12px;
+    }
+
+    /* 将“第N组”标签放在左上角 */
+    .set-row label {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        align-self: center; /* 垂直居中 */
+    }
+
+    /* 将“重量”输入框放在右上角 */
+    .set-row input[placeholder="重量"] {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+    }
+
+    /* 将“次数”输入框放在左下角 */
+    .set-row input[placeholder="次数"] {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+    }
+
+    /* 将“休息”按钮放在右下角 */
+    .set-row .timer-btn {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+        width: 100%; /* 让按钮撑满单元格 */
+    }
+
+    /* 优化弹窗在小屏幕上的显示 */
+    .modal-content {
+        width: 90%;
+        margin: 20% auto; /* 调整垂直边距 */
+        padding: 20px;
+    }
+}
+
+/* 当屏幕宽度非常窄时（例如iPhone SE）的微调 */
+@media (max-width: 375px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    button, input, select {
+        font-size: 14px; /* 进一步减小字体，防止拥挤 */
+    }
+}
