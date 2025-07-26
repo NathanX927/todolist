@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alertCloseBtn.addEventListener('click', () => customAlertModal.style.display = 'none');
     }
 
-    // ======== 模块一：日常待办 ========
+    // ======== 模块一：日常待办 (已添加数据持久化) ========
     (function DailyTodoModule() {
         const taskInput = document.getElementById('task-input');
         const addTaskBtn = document.getElementById('add-task-btn');
@@ -48,6 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const presetTasksInput = document.getElementById('preset-tasks-input');
         const savePresetBtn = document.getElementById('save-preset-btn');
         let userPresetTasks = JSON.parse(localStorage.getItem('userPresetTasks')) || { Monday: ["完成周报"], Tuesday: ["项目会议"], Wednesday: ["学习新技术"], Thursday: ["UI设计"], Friday: ["项目部署"], Saturday: ["打扫卫生"], Sunday: ["阅读"] };
+
+        function saveCurrentTasks() {
+            const tasks = [];
+            taskList.querySelectorAll('li').forEach(li => {
+                tasks.push({
+                    text: li.querySelector('.task-text').textContent,
+                    completed: li.classList.contains('completed')
+                });
+            });
+            localStorage.setItem('currentDailyTasks', JSON.stringify(tasks));
+        }
 
         function updateProgress() {
             const totalTasks = taskList.children.length;
@@ -68,14 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = isCompleted;
-            checkbox.addEventListener('change', () => { li.classList.toggle('completed'); updateProgress(); });
+            checkbox.addEventListener('change', () => { li.classList.toggle('completed'); updateProgress(); saveCurrentTasks(); });
             const textSpan = document.createElement('span');
             textSpan.className = 'task-text';
             textSpan.textContent = taskText;
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = '删除';
             deleteBtn.className = 'delete-btn';
-            deleteBtn.onclick = () => { taskList.removeChild(li); updateProgress(); };
+            deleteBtn.onclick = () => { taskList.removeChild(li); updateProgress(); saveCurrentTasks(); };
             li.appendChild(checkbox);
             li.appendChild(textSpan);
             li.appendChild(deleteBtn);
@@ -89,34 +100,38 @@ document.addEventListener('DOMContentLoaded', () => {
             taskInput.value = '';
             taskInput.focus();
             updateProgress();
+            saveCurrentTasks();
         }
+
         function loadPresetTasks(day) {
+            if (taskList.children.length > 0 && !confirm('加载预设会覆盖当前任务，确定吗?')) {
+                return;
+            }
             taskList.innerHTML = '';
             const tasks = userPresetTasks[day] || [];
             tasks.forEach(taskText => taskList.appendChild(createTaskElement(taskText)));
             updateProgress();
+            saveCurrentTasks();
         }
-        function openPresetModal() {
-            modalDaySelector.value = daySelector.value;
-            displayTasksInTextarea(daySelector.value);
-            presetModal.style.display = 'block';
-        }
-        function displayTasksInTextarea(day) {
-            presetTasksInput.value = (userPresetTasks[day] || []).join('\n');
-        }
-        function savePreset() {
-            const day = modalDaySelector.value;
-            const tasks = presetTasksInput.value.split('\n').map(t => t.trim()).filter(t => t);
-            userPresetTasks[day] = tasks;
-            localStorage.setItem('userPresetTasks', JSON.stringify(userPresetTasks));
-            alert(`“${day}”的预设已保存！`);
-            presetModal.style.display = 'none';
-        }
+
         function initialize() {
-            const today = new Date().toLocaleString('en-US', { weekday: 'long' });
-            daySelector.value = today;
-            loadPresetTasks(today);
+            const savedTasks = JSON.parse(localStorage.getItem('currentDailyTasks'));
+            if (savedTasks) {
+                taskList.innerHTML = '';
+                savedTasks.forEach(task => taskList.appendChild(createTaskElement(task.text, task.completed)));
+                updateProgress();
+            } else {
+                const today = new Date().toLocaleString('en-US', { weekday: 'long' });
+                daySelector.value = today;
+                loadPresetTasks(today);
+            }
         }
+        
+        // (此部分为管理弹窗的逻辑，与之前相同)
+        function openPresetModal() { modalDaySelector.value = daySelector.value; displayTasksInTextarea(daySelector.value); presetModal.style.display = 'block'; }
+        function displayTasksInTextarea(day) { presetTasksInput.value = (userPresetTasks[day] || []).join('\n'); }
+        function savePreset() { const day = modalDaySelector.value; const tasks = presetTasksInput.value.split('\n').map(t => t.trim()).filter(t => t); userPresetTasks[day] = tasks; localStorage.setItem('userPresetTasks', JSON.stringify(userPresetTasks)); alert(`“${day}”的预设已保存！`); presetModal.style.display = 'none'; }
+        
         addTaskBtn.addEventListener('click', addTask);
         taskInput.addEventListener('keypress', (e) => e.key === 'Enter' && addTask());
         loadPresetBtn.addEventListener('click', () => loadPresetTasks(daySelector.value));
@@ -127,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initialize();
     })();
 
-    // ======== 模块二：健身训练 ========
+    // ======== 模块二：健身训练 (已添加数据持久化) ========
     (function FitnessModule() {
         const templateSelector = document.getElementById('fitness-template-selector');
         const loadTemplateBtn = document.getElementById('load-fitness-template-btn');
@@ -143,100 +158,86 @@ document.addEventListener('DOMContentLoaded', () => {
         const saveTemplateBtn = document.getElementById('save-template-btn');
         let fitnessTemplates = JSON.parse(localStorage.getItem('fitnessTemplates')) || { "推力日 (Push)": ["平板杠铃卧推 4x10 90", "上斜哑铃卧推 3x12 75", "坐姿哑铃推举 4x10 90", "哑铃侧平举 4x15", "绳索下压 3x15 60"], "拉力日 (Pull)": ["高位下拉 4x12 75", "坐姿划船 4x12 75", "直臂下压 3x15", "哑铃弯举 4x12 60", "腹部训练 5x20 45"] };
 
-        function populateTemplateSelectors() {
-            templateSelector.innerHTML = '';
-            templateListSelector.innerHTML = '';
-            Object.keys(fitnessTemplates).forEach(name => {
-                templateSelector.add(new Option(name, name));
-                templateListSelector.add(new Option(name, name));
+        function saveCurrentWorkout() {
+            const workoutData = [];
+            workoutSession.querySelectorAll('.exercise-card').forEach(card => {
+                const exercise = {
+                    header: card.querySelector('.exercise-header').textContent,
+                    sets: []
+                };
+                card.querySelectorAll('.set-row').forEach(row => {
+                    exercise.sets.push({
+                        weight: row.querySelector('.input-weight').value,
+                        reps: row.querySelector('.input-reps').value,
+                        rest: row.querySelector('.timer-btn').dataset.rest
+                    });
+                });
+                workoutData.push(exercise);
+            });
+            if (workoutData.length > 0) {
+                localStorage.setItem('currentWorkoutSession', JSON.stringify(workoutData));
+            } else {
+                localStorage.removeItem('currentWorkoutSession');
+            }
+        }
+        
+        function loadSavedWorkout(savedData) {
+            workoutSession.innerHTML = '';
+            savedData.forEach(exerciseData => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                const header = document.createElement('div');
+                header.className = 'exercise-header';
+                header.textContent = exerciseData.header;
+                card.appendChild(header);
+                const setsContainer = document.createElement('div');
+                setsContainer.className = 'sets-container';
+                exerciseData.sets.forEach((setData, index) => {
+                    const setRow = document.createElement('div');
+                    setRow.className = 'set-row';
+                    setRow.innerHTML = `<label>第${index + 1}组</label><input type="number" class="input-weight" placeholder="重量" value="${setData.weight || ''}"><input type="number" class="input-reps" placeholder="次数" value="${setData.reps || ''}"><button class="timer-btn" data-rest="${setData.rest}">休息${setData.rest}s</button>`;
+                    setsContainer.appendChild(setRow);
+                });
+                card.appendChild(setsContainer);
+                workoutSession.appendChild(card);
             });
         }
-        function saveTemplates() {
-            localStorage.setItem('fitnessTemplates', JSON.stringify(fitnessTemplates));
+        
+        function initializeFitness() {
+            const savedWorkout = JSON.parse(localStorage.getItem('currentWorkoutSession'));
+            if (savedWorkout) {
+                loadSavedWorkout(savedWorkout);
+            }
             populateTemplateSelectors();
         }
+
         function loadWorkout(templateName) {
+            if (workoutSession.children.length > 0 && !confirm('加载新模板会覆盖当前训练进度，确定吗?')) {
+                return;
+            }
             workoutSession.innerHTML = '';
             const exercises = fitnessTemplates[templateName] || [];
             exercises.forEach(str => workoutSession.appendChild(createExerciseCard(str)));
+            saveCurrentWorkout();
         }
-        function createExerciseCard(exerciseString) {
-            const parts = exerciseString.match(/(.+) (\d+)x(\d+)(?: (\d+))?/);
-            if (!parts) return document.createDocumentFragment();
-            const [, name, sets, reps, restTime] = parts;
-            const restDuration = restTime || 60;
-            const card = document.createElement('div');
-            card.className = 'exercise-card';
-            const header = document.createElement('div');
-            header.className = 'exercise-header';
-            header.textContent = `${name} (目标: ${sets}组 x ${reps}次)`;
-            card.appendChild(header);
-            const setsContainer = document.createElement('div');
-            setsContainer.className = 'sets-container';
-            for (let i = 1; i <= sets; i++) {
-                const setRow = document.createElement('div');
-                setRow.className = 'set-row';
-                setRow.innerHTML = `<label>第${i}组</label><input type="number" class="input-weight" placeholder="重量"><input type="number" class="input-reps" placeholder="次数"><button class="timer-btn" data-rest="${restDuration}">休息${restDuration}s</button>`;
-                setsContainer.appendChild(setRow);
-            }
-            card.appendChild(setsContainer);
-            return card;
-        }
+
+        // (此部分为大部分模块功能，与之前相同)
+        function populateTemplateSelectors() { Object.keys(fitnessTemplates).forEach(name => { templateSelector.add(new Option(name, name)); templateListSelector.add(new Option(name, name)); }); }
+        function createExerciseCard(exerciseString) { const parts = exerciseString.match(/(.+) (\d+)x(\d+)(?: (\d+))?/); if (!parts) return document.createDocumentFragment(); const [, name, sets, reps, restTime] = parts; const restDuration = restTime || 60; const card = document.createElement('div'); card.className = 'exercise-card'; const header = document.createElement('div'); header.className = 'exercise-header'; header.textContent = `${name} (目标: ${sets}组 x ${reps}次)`; card.appendChild(header); const setsContainer = document.createElement('div'); setsContainer.className = 'sets-container'; for (let i = 1; i <= sets; i++) { const setRow = document.createElement('div'); setRow.className = 'set-row'; setRow.innerHTML = `<label>第${i}组</label><input type="number" class="input-weight" placeholder="重量"><input type="number" class="input-reps" placeholder="次数"><button class="timer-btn" data-rest="${restDuration}">休息${restDuration}s</button>`; setsContainer.appendChild(setRow); } card.appendChild(setsContainer); return card; }
+        
+        workoutSession.addEventListener('input', (e) => { if (e.target.classList.contains('input-weight') || e.target.classList.contains('input-reps')) { saveCurrentWorkout(); }});
+        loadTemplateBtn.addEventListener('click', () => { if (templateSelector.value) loadWorkout(templateSelector.value); });
+        
+        // (弹窗管理和计时器逻辑，与之前相同)
         manageTemplatesBtn.addEventListener('click', () => { modal.style.display = 'block'; templateNameInput.value = ''; templateExercisesInput.value = ''; });
         closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-        editTemplateBtn.addEventListener('click', () => {
-            const name = templateListSelector.value;
-            if (name) {
-                templateNameInput.value = name;
-                templateExercisesInput.value = fitnessTemplates[name].join('\n');
-            }
-        });
-        deleteTemplateBtn.addEventListener('click', () => {
-            const name = templateListSelector.value;
-            if (name && confirm(`确定要删除模板 “${name}” 吗？`)) {
-                delete fitnessTemplates[name];
-                saveTemplates();
-                templateNameInput.value = '';
-                templateExercisesInput.value = '';
-            }
-        });
-        saveTemplateBtn.addEventListener('click', () => {
-            const name = templateNameInput.value.trim();
-            const exercises = templateExercisesInput.value.split('\n').filter(e => e.trim());
-            if (!name || exercises.length === 0) {
-                alert('模板名称和动作列表不能为空！');
-                return;
-            }
-            fitnessTemplates[name] = exercises;
-            saveTemplates();
-            alert('模板已保存！');
-        });
-        loadTemplateBtn.addEventListener('click', () => {
-            if (templateSelector.value) loadWorkout(templateSelector.value);
-        });
-        workoutSession.addEventListener('click', function (e) {
-            if (e.target.classList.contains('timer-btn') && !e.target.disabled) {
-                const btn = e.target;
-                const restTime = btn.dataset.rest;
-                let seconds = parseInt(restTime, 10);
-                btn.disabled = true;
-                const interval = setInterval(() => {
-                    btn.textContent = `... ${seconds}s`;
-                    seconds--;
-                    if (seconds < 0) {
-                        clearInterval(interval);
-                        if (typeof showCustomAlert === 'function') {
-                            showCustomAlert('能量补充完毕!', '准备好进行下一组训练！');
-                        } else {
-                            alert('休息结束，开始下一组！');
-                        }
-                        btn.textContent = `休息${restTime}s`;
-                        btn.disabled = false;
-                    }
-                }, 1000);
-            }
-        });
-        populateTemplateSelectors();
+        function saveTemplates() { localStorage.setItem('fitnessTemplates', JSON.stringify(fitnessTemplates)); populateTemplateSelectors(); }
+        editTemplateBtn.addEventListener('click', () => { const name = templateListSelector.value; if (name) { templateNameInput.value = name; templateExercisesInput.value = fitnessTemplates[name].join('\n'); } });
+        deleteTemplateBtn.addEventListener('click', () => { const name = templateListSelector.value; if (name && confirm(`确定要删除模板 “${name}” 吗？`)) { delete fitnessTemplates[name]; saveTemplates(); templateNameInput.value = ''; templateExercisesInput.value = ''; } });
+        saveTemplateBtn.addEventListener('click', () => { const name = templateNameInput.value.trim(); const exercises = templateExercisesInput.value.split('\n').filter(e => e.trim()); if (!name || exercises.length === 0) { alert('模板名称和动作列表不能为空！'); return; } fitnessTemplates[name] = exercises; saveTemplates(); alert('模板已保存！'); });
+        workoutSession.addEventListener('click', function (e) { if (e.target.classList.contains('timer-btn') && !e.target.disabled) { const btn = e.target; const restTime = btn.dataset.rest; let seconds = parseInt(restTime, 10); btn.disabled = true; const interval = setInterval(() => { btn.textContent = `... ${seconds}s`; seconds--; if (seconds < 0) { clearInterval(interval); if (typeof showCustomAlert === 'function') { showCustomAlert('能量补充完毕!', '准备好进行下一组训练！'); } else { alert('休息结束，开始下一组！'); } btn.textContent = `休息${restTime}s`; btn.disabled = false; } }, 1000); } });
+
+        initializeFitness();
     })();
 
     // 初始化默认视图
