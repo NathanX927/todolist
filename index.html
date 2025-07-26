@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复古未来生活助手</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 主导航栏 -->
+    <nav class="main-nav">
+        <button id="nav-daily" class="nav-btn active">日常待办</button>
+        <button id="nav-fitness" class="nav-btn">健身训练</button>
+    </nav>
+
+    <!-- ======== 日常待办视图 ======== -->
+    <div id="daily-view" class="view active-view">
+        <div class="container">
+            <h1>日常待办事项</h1>
+            <div class="input-container">
+                <input type="text" id="task-input" placeholder="添加新任务...">
+                <button id="add-task-btn">添加</button>
+            </div>
+            <div class="preset-container">
+                <p><strong>预设任务:</strong></p>
+                <select id="day-selector">
+                    <option value="Monday">周一</option>
+                    <option value="Tuesday">周二</option>
+                    <option value="Wednesday">周三</option>
+                    <option value="Thursday">周四</option>
+                    <option value="Friday">周五</option>
+                    <option value="Saturday">周六</option>
+                    <option value="Sunday">周日</option>
+                </select>
+                <button id="load-preset-btn">加载</button>
+                <button id="manage-preset-btn">管理预设</button>
+            </div>
+            <ul id="task-list"></ul>
+            <div class="progress-section">
+                <label>今日任务完成进度:</label>
+                <div class="progress-bar-container"><div id="progress-bar"></div></div>
+                <span id="progress-text">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 健身训练视图 ======== -->
+    <div id="fitness-view" class="view">
+        <div class="container">
+            <h1>健身训练记录</h1>
+            <div class="preset-container">
+                <p><strong>训练模板:</strong></p>
+                <select id="fitness-template-selector"></select>
+                <button id="load-fitness-template-btn">加载训练</button>
+                <button id="manage-fitness-templates-btn">管理模板</button>
+            </div>
+            <div id="workout-session">
+                <!-- 训练动作卡片将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 弹窗区域 ======== -->
+    
+    <!-- 日常预设管理弹窗 -->
+    <div id="preset-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-preset-modal">&times;</span>
+            <h2>管理预设任务</h2>
+            <div class="modal-body">
+                <label for="modal-day-selector">选择日期:</label>
+                <select id="modal-day-selector">
+                    <option value="Monday">周一</option>
+                    <option value="Tuesday">周二</option>
+                    <option value="Wednesday">周三</option>
+                    <option value="Thursday">周四</option>
+                    <option value="Friday">周五</option>
+                    <option value="Saturday">周六</option>
+                    <option value="Sunday">周日</option>
+                </select>
+                <label for="preset-tasks-input">任务列表 (每行一个):</label>
+                <textarea id="preset-tasks-input" rows="8" placeholder="在此输入任务，每行一个..."></textarea>
+                <button id="save-preset-btn">保存当前预设</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 健身模板管理弹窗 -->
+    <div id="fitness-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-fitness-modal">&times;</span>
+            <h2>管理健身模板</h2>
+            <div class="modal-body">
+                <div class="template-management">
+                    <select id="template-list-selector"></select>
+                    <button id="edit-template-btn">编辑</button>
+                    <button id="delete-template-btn">删除</button>
+                </div>
+                <hr>
+                <div id="template-editor">
+                    <label for="template-name-input">模板名称:</label>
+                    <input type="text" id="template-name-input" placeholder="例如：推力日">
+                    <label for="template-exercises-input">训练动作 (每行一个):</label>
+                    <textarea id="template-exercises-input" rows="8" placeholder="格式: 动作 组x次 [休息秒数]&#10;例如: 平板卧推 4x10 90&#10;例如: 哑铃弯举 4x15 (默认60秒)"></textarea>
+                    <button id="save-template-btn">保存模板</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <!-- (将此部分代码追加到 <body> 的末尾) -->
+
+    <!-- 全新的自定义提示弹窗 -->
+    <div id="custom-alert-modal" class="modal">
+        <div class="modal-content alert-modal-content">
+            <!-- 一个符合风格的SVG图标，模拟一个能量饮料瓶 -->
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <path d="M35 10 h30 v10 h-30 z" />
+                <path d="M30 20 h40 v5 h-40 z" />
+                <path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" />
+                <path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" />
+            </svg>
+            <h2 id="alert-title">能量补充完毕!</h2>
+            <p id="alert-message">准备好进行下一组训练！</p>
+            <button id="alert-close-btn">继续训练</button>
+        </div>
+    </div>
+
+</body>
+</html>

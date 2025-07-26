@@ -1,0 +1,219 @@
+/* ======== 全局样式：温暖复古未来风 ======== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+    --bg-color: #f0e9e0; /* 背景米白色 */
+    --container-bg: #ffffff; /* 容器白色 */
+    --text-color: #333d42; /* 主要文字 - 深炭灰色 */
+    --accent-orange: #d95f43; /* 主强调色 - 脏橘色 */
+    --accent-green: #7c8c7c; /* 次要颜色 - 灰绿色 */
+    --border-color: #d1c9bd; /* 边框色 */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s;
+}
+
+/* ======== 主导航栏 ======== */
+.main-nav {
+    display: flex;
+    justify-content: center;
+    background-color: #e6ddd1; /* 比背景稍深的米色 */
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+.nav-btn {
+    padding: 8px 18px;
+    border: 2px solid transparent;
+    background-color: transparent;
+    color: var(--accent-green);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 20px; /* 圆润的胶囊形状 */
+    margin: 0 5px;
+    transition: all 0.3s ease;
+    text-shadow: none; /* 移除辉光 */
+}
+.nav-btn.active {
+    background-color: var(--accent-orange);
+    color: white;
+}
+.nav-btn:not(.active):hover {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* ======== 视图容器 ======== */
+.view { display: none; }
+.view.active-view { display: block; animation: fadeInView 0.5s ease; }
+@keyframes fadeInView { from { opacity: 0; } to { opacity: 1; } }
+
+.container {
+    background: var(--container-bg);
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px; /* 更圆润的边角 */
+    box-shadow: 0 4px 15px var(--shadow-color);
+    width: 90%;
+    max-width: 600px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: var(--text-color);
+    font-weight: 600;
+    text-shadow: none;
+}
+hr { border: none; border-top: 1px solid var(--border-color); }
+
+/* ======== 表单与按钮样式 ======== */
+.input-container, .preset-container { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+
+input, textarea, select {
+    background-color: #f7f3ed;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    flex-grow: 1;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 5px rgba(217, 95, 67, 0.3);
+}
+
+button {
+    padding: 12px 20px;
+    background-color: var(--accent-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+    text-shadow: none;
+    flex-shrink: 0;
+}
+
+button:hover {
+    background-color: #6a796a; /* 悬停时变暗 */
+}
+
+/* 主操作按钮使用橘色 */
+#add-task-btn, #load-preset-btn, #load-fitness-template-btn, #save-preset-btn, #save-template-btn {
+    background-color: var(--accent-orange);
+}
+#add-task-btn:hover, #load-preset-btn:hover, #load-fitness-template-btn:hover, #save-preset-btn:hover, #save-template-btn:hover {
+    background-color: #c94f34; /* 悬停时变暗 */
+}
+
+/* ======== 任务列表 & 健身卡片 ======== */
+ul { list-style-type: none; padding: 0; margin: 20px 0; }
+
+li, .exercise-card {
+    background: #fdfaf6;
+    border: 1px solid #e9e2d9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+li:hover, .exercise-card:hover {
+    border-color: var(--accent-green);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transform: translateY(-2px);
+}
+
+li.completed { background-color: #f5f2ed; }
+li.completed .task-text { text-decoration: line-through; color: #999; }
+li .task-text { flex-grow: 1; }
+
+.delete-btn {
+    background-color: #d1c9bd;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+li:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { background-color: #bcaea0; }
+
+.exercise-card { flex-direction: column; align-items: stretch; }
+.exercise-header { font-weight: 600; font-size: 1.1em; color: var(--text-color); }
+.sets-container { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.set-row { display: grid; grid-template-columns: 40px 1fr 1fr 90px; gap: 10px; align-items: center; }
+.set-row .timer-btn:disabled { background-color: var(--accent-orange); cursor: not-allowed; }
+
+/* ======== 进度条 ======== */
+.progress-section { margin-top: 20px; }
+.progress-bar-container { background-color: #e9e2d9; border-radius: 10px; height: 20px; overflow: hidden; }
+#progress-bar { height: 100%; background-color: var(--accent-orange); border-radius: 10px; transition: width 0.5s ease-in-out; }
+#progress-text { font-weight: 600; margin-top: 5px; display: inline-block; color: var(--accent-green); }
+
+/* ======== 弹窗 (Modal) ======== */
+.modal {
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(51, 61, 66, 0.6); /* 半透明深灰色背景 */
+    backdrop-filter: blur(5px);
+}
+.modal-content {
+    background-color: var(--container-bg);
+    margin: 10% auto; padding: 30px; border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.close-btn { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 32px; font-weight: normal; cursor: pointer; transition: color 0.2s; }
+.close-btn:hover { color: var(--accent-orange); }
+
+/* (将此部分代码追加到 styles.css 文件末尾) */
+
+/* ======== 自定义提示弹窗样式 ======== */
+.alert-modal-content {
+    text-align: center;
+    max-width: 350px; /* 弹窗更小巧 */
+    padding-top: 50px;
+}
+
+.alert-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+}
+
+/* SVG 图标样式 */
+.alert-icon path {
+    fill: var(--accent-orange);
+}
+.alert-icon path.bolt {
+    fill: var(--container-bg);
+}
+
+#alert-title {
+    color: var(--accent-orange);
+    margin-bottom: 10px;
+}
+
+#alert-message {
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+#alert-close-btn {
+    width: 80%;
+    background-color: var(--accent-orange);
+}
