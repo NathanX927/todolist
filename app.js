@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navFitness = document.getElementById('nav-fitness');
     const dailyView = document.getElementById('daily-view');
     const fitnessView = document.getElementById('fitness-view');
-
     function switchView(viewToShow) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -23,18 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const customAlertModal = document.getElementById('custom-alert-modal');
     if (customAlertModal) {
         const alertCloseBtn = document.getElementById('alert-close-btn');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
         function showCustomAlert(title, message) {
-            document.getElementById('alert-title').textContent = title;
-            document.getElementById('alert-message').textContent = message;
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
             customAlertModal.style.display = 'block';
         }
-        function hideCustomAlert() {
-            customAlertModal.style.display = 'none';
-        }
-        alertCloseBtn.addEventListener('click', hideCustomAlert);
+        alertCloseBtn.addEventListener('click', () => customAlertModal.style.display = 'none');
     }
-    
-    // ======== 模块一：日常待办 (完整功能) ========
+
+    // ======== 模块一：日常待办 ========
     (function DailyTodoModule() {
         const taskInput = document.getElementById('task-input');
         const addTaskBtn = document.getElementById('add-task-btn');
@@ -49,12 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalDaySelector = document.getElementById('modal-day-selector');
         const presetTasksInput = document.getElementById('preset-tasks-input');
         const savePresetBtn = document.getElementById('save-preset-btn');
-        
-        const defaultPresetTasks = {
-            Monday: ["完成周报", "整理代码"], Tuesday: ["项目会议"], Wednesday: ["学习新技术"],
-            Thursday: ["UI设计"], Friday: ["项目部署"], Saturday: ["打扫卫生"], Sunday: ["阅读"]
-        };
-        let userPresetTasks = JSON.parse(localStorage.getItem('userPresetTasks')) || defaultPresetTasks;
+        let userPresetTasks = JSON.parse(localStorage.getItem('userPresetTasks')) || { Monday: ["完成周报"], Tuesday: ["项目会议"], Wednesday: ["学习新技术"], Thursday: ["UI设计"], Friday: ["项目部署"], Saturday: ["打扫卫生"], Sunday: ["阅读"] };
 
         function updateProgress() {
             const totalTasks = taskList.children.length;
@@ -75,20 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = isCompleted;
-            checkbox.addEventListener('change', () => {
-                li.classList.toggle('completed');
-                updateProgress();
-            });
+            checkbox.addEventListener('change', () => { li.classList.toggle('completed'); updateProgress(); });
             const textSpan = document.createElement('span');
             textSpan.className = 'task-text';
             textSpan.textContent = taskText;
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = '删除';
             deleteBtn.className = 'delete-btn';
-            deleteBtn.onclick = () => {
-                taskList.removeChild(li);
-                updateProgress();
-            };
+            deleteBtn.onclick = () => { taskList.removeChild(li); updateProgress(); };
             li.appendChild(checkbox);
             li.appendChild(textSpan);
             li.appendChild(deleteBtn);
@@ -103,54 +90,44 @@ document.addEventListener('DOMContentLoaded', () => {
             taskInput.focus();
             updateProgress();
         }
-
         function loadPresetTasks(day) {
             taskList.innerHTML = '';
             const tasks = userPresetTasks[day] || [];
             tasks.forEach(taskText => taskList.appendChild(createTaskElement(taskText)));
             updateProgress();
         }
-
         function openPresetModal() {
             modalDaySelector.value = daySelector.value;
             displayTasksInTextarea(daySelector.value);
             presetModal.style.display = 'block';
         }
-
-        function closePresetModal() {
-            presetModal.style.display = 'none';
-        }
-
         function displayTasksInTextarea(day) {
             presetTasksInput.value = (userPresetTasks[day] || []).join('\n');
         }
-
         function savePreset() {
             const day = modalDaySelector.value;
             const tasks = presetTasksInput.value.split('\n').map(t => t.trim()).filter(t => t);
             userPresetTasks[day] = tasks;
             localStorage.setItem('userPresetTasks', JSON.stringify(userPresetTasks));
             alert(`“${day}”的预设已保存！`);
-            closePresetModal();
+            presetModal.style.display = 'none';
         }
-
         function initialize() {
             const today = new Date().toLocaleString('en-US', { weekday: 'long' });
             daySelector.value = today;
             loadPresetTasks(today);
         }
-
         addTaskBtn.addEventListener('click', addTask);
         taskInput.addEventListener('keypress', (e) => e.key === 'Enter' && addTask());
         loadPresetBtn.addEventListener('click', () => loadPresetTasks(daySelector.value));
         managePresetBtn.addEventListener('click', openPresetModal);
-        closeModalBtn.addEventListener('click', closePresetModal);
+        closeModalBtn.addEventListener('click', () => presetModal.style.display = 'none');
         savePresetBtn.addEventListener('click', savePreset);
         modalDaySelector.addEventListener('change', (e) => displayTasksInTextarea(e.target.value));
         initialize();
     })();
 
-    // ======== 模块二：健身训练 (完整功能 + 加固) ========
+    // ======== 模块二：健身训练 ========
     (function FitnessModule() {
         const templateSelector = document.getElementById('fitness-template-selector');
         const loadTemplateBtn = document.getElementById('load-fitness-template-btn');
@@ -164,12 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const templateNameInput = document.getElementById('template-name-input');
         const templateExercisesInput = document.getElementById('template-exercises-input');
         const saveTemplateBtn = document.getElementById('save-template-btn');
-        
-        const defaultFitnessTemplates = {
-            "推力日 (Push)": ["平板杠铃卧推 4x10 90", "上斜哑铃卧推 3x12 75", "坐姿哑铃推举 4x10 90", "哑铃侧平举 4x15", "绳索下压 3x15 60"],
-            "拉力日 (Pull)": ["高位下拉 4x12 75", "坐姿划船 4x12 75", "直臂下压 3x15", "哑铃弯举 4x12 60", "腹部训练 5x20 45"]
-        };
-        let fitnessTemplates = JSON.parse(localStorage.getItem('fitnessTemplates')) || defaultFitnessTemplates;
+        let fitnessTemplates = JSON.parse(localStorage.getItem('fitnessTemplates')) || { "推力日 (Push)": ["平板杠铃卧推 4x10 90", "上斜哑铃卧推 3x12 75", "坐姿哑铃推举 4x10 90", "哑铃侧平举 4x15", "绳索下压 3x15 60"], "拉力日 (Pull)": ["高位下拉 4x12 75", "坐姿划船 4x12 75", "直臂下压 3x15", "哑铃弯举 4x12 60", "腹部训练 5x20 45"] };
 
         function populateTemplateSelectors() {
             templateSelector.innerHTML = '';
@@ -179,18 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 templateListSelector.add(new Option(name, name));
             });
         }
-
         function saveTemplates() {
             localStorage.setItem('fitnessTemplates', JSON.stringify(fitnessTemplates));
             populateTemplateSelectors();
         }
-
         function loadWorkout(templateName) {
             workoutSession.innerHTML = '';
             const exercises = fitnessTemplates[templateName] || [];
             exercises.forEach(str => workoutSession.appendChild(createExerciseCard(str)));
         }
-        
         function createExerciseCard(exerciseString) {
             const parts = exerciseString.match(/(.+) (\d+)x(\d+)(?: (\d+))?/);
             if (!parts) return document.createDocumentFragment();
@@ -207,24 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= sets; i++) {
                 const setRow = document.createElement('div');
                 setRow.className = 'set-row';
-                // [核心加固] 为输入框添加了class
                 setRow.innerHTML = `<label>第${i}组</label><input type="number" class="input-weight" placeholder="重量"><input type="number" class="input-reps" placeholder="次数"><button class="timer-btn" data-rest="${restDuration}">休息${restDuration}s</button>`;
                 setsContainer.appendChild(setRow);
             }
             card.appendChild(setsContainer);
             return card;
         }
-
         manageTemplatesBtn.addEventListener('click', () => { modal.style.display = 'block'; templateNameInput.value = ''; templateExercisesInput.value = ''; });
         closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-        
         editTemplateBtn.addEventListener('click', () => {
             const name = templateListSelector.value;
-            if (!name) return;
-            templateNameInput.value = name;
-            templateExercisesInput.value = fitnessTemplates[name].join('\n');
+            if (name) {
+                templateNameInput.value = name;
+                templateExercisesInput.value = fitnessTemplates[name].join('\n');
+            }
         });
-
         deleteTemplateBtn.addEventListener('click', () => {
             const name = templateListSelector.value;
             if (name && confirm(`确定要删除模板 “${name}” 吗？`)) {
@@ -234,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 templateExercisesInput.value = '';
             }
         });
-
         saveTemplateBtn.addEventListener('click', () => {
             const name = templateNameInput.value.trim();
             const exercises = templateExercisesInput.value.split('\n').filter(e => e.trim());
@@ -246,12 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
             saveTemplates();
             alert('模板已保存！');
         });
-
         loadTemplateBtn.addEventListener('click', () => {
             if (templateSelector.value) loadWorkout(templateSelector.value);
         });
-        
-        workoutSession.addEventListener('click', function(e) {
+        workoutSession.addEventListener('click', function (e) {
             if (e.target.classList.contains('timer-btn') && !e.target.disabled) {
                 const btn = e.target;
                 const restTime = btn.dataset.rest;
@@ -273,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             }
         });
-        
         populateTemplateSelectors();
     })();
 

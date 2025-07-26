@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>复古未来生活助手</title>
+    <title>全功能生活助手</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- 主导航栏 -->
     <nav class="main-nav">
         <button id="nav-daily" class="nav-btn active">日常待办</button>
         <button id="nav-fitness" class="nav-btn">健身训练</button>
     </nav>
 
-    <!-- ======== 日常待办视图 ======== -->
     <div id="daily-view" class="view active-view">
         <div class="container">
             <h1>日常待办事项</h1>
@@ -48,7 +45,6 @@
         </div>
     </div>
 
-    <!-- ======== 健身训练视图 ======== -->
     <div id="fitness-view" class="view">
         <div class="container">
             <h1>健身训练记录</h1>
@@ -58,15 +54,10 @@
                 <button id="load-fitness-template-btn">加载训练</button>
                 <button id="manage-fitness-templates-btn">管理模板</button>
             </div>
-            <div id="workout-session">
-                <!-- 训练动作卡片将在这里动态生成 -->
-            </div>
+            <div id="workout-session"></div>
         </div>
     </div>
 
-    <!-- ======== 弹窗区域 ======== -->
-    
-    <!-- 日常预设管理弹窗 -->
     <div id="preset-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="close-preset-modal">&times;</span>
@@ -88,8 +79,7 @@
             </div>
         </div>
     </div>
-    
-    <!-- 健身模板管理弹窗 -->
+
     <div id="fitness-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="close-fitness-modal">&times;</span>
@@ -112,25 +102,14 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
-
-    <!-- (将此部分代码追加到 <body> 的末尾) -->
-
-    <!-- 全新的自定义提示弹窗 -->
     <div id="custom-alert-modal" class="modal">
         <div class="modal-content alert-modal-content">
-            <!-- 一个符合风格的SVG图标，模拟一个能量饮料瓶 -->
-            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                <path d="M35 10 h30 v10 h-30 z" />
-                <path d="M30 20 h40 v5 h-40 z" />
-                <path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" />
-                <path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" />
-            </svg>
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M35 10 h30 v10 h-30 z" /><path d="M30 20 h40 v5 h-40 z" /><path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" /><path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" /></svg>
             <h2 id="alert-title">能量补充完毕!</h2>
             <p id="alert-message">准备好进行下一组训练！</p>
             <button id="alert-close-btn">继续训练</button>
         </div>
     </div>
-
+    <script src="app.js"></script>
 </body>
 </html>
