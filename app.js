@@ -1,4 +1,42 @@
+const CURRENT_VERSION = '1.0.6';  // 版本号，发布时手动更新
+const UPDATE_MESSAGE = `
+  版本 1.0.6 更新内容：
+  - 新增页面更新弹窗提示
+  - 修复部分已知问题
+  - 优化功能体验
+`;
+
+// 版本提示弹窗函数
+function showUpdateModal(message) {
+    document.getElementById('icon-info').style.display = 'block';
+    document.getElementById('icon-energy').style.display = 'none';
+
+    const modal = document.getElementById('custom-alert-modal');
+    document.getElementById('alert-title').textContent = '应用更新提示';
+    document.getElementById('alert-message').textContent = message;
+    const closeBtn = document.getElementById('alert-close-btn');
+    closeBtn.textContent = '明白收到'; // ***设为“明白收到”***
+    modal.style.display = 'block';
+
+    function closeHandler() {
+        modal.style.display = 'none';
+        closeBtn.removeEventListener('click', closeHandler);
+    }
+    closeBtn.addEventListener('click', closeHandler);
+}
+
+
+// 版本检查函数
+function checkAndShowUpdate() {
+    const lastVersion = localStorage.getItem('app_version');
+    if (lastVersion !== CURRENT_VERSION) {
+        showUpdateModal(UPDATE_MESSAGE.trim());
+        localStorage.setItem('app_version', CURRENT_VERSION);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    checkAndShowUpdate();
     // ======== 全局：视图切换 ========
     const navDaily = document.getElementById('nav-daily');
     const navFitness = document.getElementById('nav-fitness');
@@ -28,19 +66,22 @@ document.addEventListener('DOMContentLoaded', () => {
     navAnalysis.addEventListener('click', () => switchView('analysis'));
 
     // ======== 全局：自定义弹窗逻辑 ========
-    const customAlertModal = document.getElementById('custom-alert-modal');
-    if (customAlertModal) {
-        const alertCloseBtn = document.getElementById('alert-close-btn');
-        const alertTitle = document.getElementById('alert-title');
-        const alertMessage = document.getElementById('alert-message');
+    function showEnergyModal(title, message) {
+        document.getElementById('icon-info').style.display = 'none';
+        document.getElementById('icon-energy').style.display = 'block';
 
-        function showCustomAlert(title, message) {
-            alertTitle.textContent = title;
-            alertMessage.textContent = message;
-            customAlertModal.style.display = 'block';
+        const modal = document.getElementById('custom-alert-modal');
+        document.getElementById('alert-title').textContent = title;
+        document.getElementById('alert-message').textContent = message;
+        modal.style.display = 'block';
+        const closeBtn = document.getElementById('alert-close-btn');
+        function closeHandler() {
+            modal.style.display = 'none';
+            closeBtn.removeEventListener('click', closeHandler);
         }
-        alertCloseBtn.addEventListener('click', () => customAlertModal.style.display = 'none');
+        closeBtn.addEventListener('click', closeHandler);
     }
+
 
     // ======== 模块一：日常待办 ========
     (function DailyTodoModule() {
@@ -403,8 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     seconds--;
                     if (seconds < 0) {
                         clearInterval(interval);
-                        if (typeof showCustomAlert === 'function') {
-                            showCustomAlert('能量补充完毕!', '准备好进行下一组训练！');
+                        if (typeof showEnergyAlert === 'function') {
+                            showEnergyAlert('能量补充完毕!', '准备好进行下一组训练！');
                         } else {
                             alert('休息结束，开始下一组！');
                         }

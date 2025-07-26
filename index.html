@@ -143,11 +143,18 @@
 
     <div id="custom-alert-modal" class="modal">
         <div class="modal-content alert-modal-content">
-            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                <path d="M35 10 h30 v10 h-30 z" />
-                <path d="M30 20 h40 v5 h-40 z" />
-                <path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" />
-                <path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" />
+            <!-- 信息提示图标（id="icon-info"，用于“应用更新提示”） -->
+            <svg id="icon-info" class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="display: none;">
+            <circle cx="50" cy="50" r="45" fill="#d95f43"/>
+            <rect x="46" y="38" width="8" height="32" rx="4" fill="#fff"/>
+            <circle cx="50" cy="28" r="5" fill="#fff"/>
+            </svg>
+            <!-- 闪电能量补充图标（id="icon-energy"，用于训练弹窗） -->
+            <svg id="icon-energy" class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="display: none;">
+            <path d="M35 10 h30 v10 h-30 z" fill="#d95f43"/>
+            <path d="M30 20 h40 v5 h-40 z" fill="#d95f43"/>
+            <path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" fill="#d95f43"/>
+            <path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" fill="#fff"/>
             </svg>
             <h2 id="alert-title">能量补充完毕!</h2>
             <p id="alert-message">准备好进行下一组训练！</p>
