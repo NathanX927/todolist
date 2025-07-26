@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alertCloseBtn.addEventListener('click', hideCustomAlert);
     }
     
-    // ======== 模块一：日常待办 (已恢复完整功能) ========
+    // ======== 模块一：日常待办 (完整功能) ========
     (function DailyTodoModule() {
         const taskInput = document.getElementById('task-input');
         const addTaskBtn = document.getElementById('add-task-btn');
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         function createTaskElement(taskText, isCompleted = false) {
             const li = document.createElement('li');
             if (isCompleted) li.classList.add('completed');
-            
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = isCompleted;
@@ -80,11 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.classList.toggle('completed');
                 updateProgress();
             });
-
             const textSpan = document.createElement('span');
             textSpan.className = 'task-text';
             textSpan.textContent = taskText;
-
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = '删除';
             deleteBtn.className = 'delete-btn';
@@ -92,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 taskList.removeChild(li);
                 updateProgress();
             };
-
             li.appendChild(checkbox);
             li.appendChild(textSpan);
             li.appendChild(deleteBtn);
@@ -151,11 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModalBtn.addEventListener('click', closePresetModal);
         savePresetBtn.addEventListener('click', savePreset);
         modalDaySelector.addEventListener('change', (e) => displayTasksInTextarea(e.target.value));
-        
         initialize();
     })();
 
-    // ======== 模块二：健身训练 (完整功能) ========
+    // ======== 模块二：健身训练 (完整功能 + 加固) ========
     (function FitnessModule() {
         const templateSelector = document.getElementById('fitness-template-selector');
         const loadTemplateBtn = document.getElementById('load-fitness-template-btn');
@@ -201,21 +196,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!parts) return document.createDocumentFragment();
             const [, name, sets, reps, restTime] = parts;
             const restDuration = restTime || 60;
-            
             const card = document.createElement('div');
             card.className = 'exercise-card';
-            
             const header = document.createElement('div');
             header.className = 'exercise-header';
             header.textContent = `${name} (目标: ${sets}组 x ${reps}次)`;
             card.appendChild(header);
-            
             const setsContainer = document.createElement('div');
             setsContainer.className = 'sets-container';
             for (let i = 1; i <= sets; i++) {
                 const setRow = document.createElement('div');
                 setRow.className = 'set-row';
-                setRow.innerHTML = `<label>第${i}组</label><input type="number" placeholder="重量"><input type="number" placeholder="次数"><button class="timer-btn" data-rest="${restDuration}">休息${restDuration}s</button>`;
+                // [核心加固] 为输入框添加了class
+                setRow.innerHTML = `<label>第${i}组</label><input type="number" class="input-weight" placeholder="重量"><input type="number" class="input-reps" placeholder="次数"><button class="timer-btn" data-rest="${restDuration}">休息${restDuration}s</button>`;
                 setsContainer.appendChild(setRow);
             }
             card.appendChild(setsContainer);
@@ -269,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     seconds--;
                     if (seconds < 0) {
                         clearInterval(interval);
-                        // 调用全局的自定义弹窗
                         if (typeof showCustomAlert === 'function') {
                             showCustomAlert('能量补充完毕!', '准备好进行下一组训练！');
                         } else {
@@ -288,13 +280,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化默认视图
     switchView('daily');
 });
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').then(registration => {
-      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }).catch(err => {
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
