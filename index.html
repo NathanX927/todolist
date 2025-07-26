@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link rel="apple-touch-icon" href="apple-icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全功能生活助手</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-icon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="main-nav">
         <button id="nav-daily" class="nav-btn active">日常待办</button>
         <button id="nav-fitness" class="nav-btn">健身训练</button>
+        <button id="nav-analysis" class="nav-btn">训练分析</button>
     </nav>
 
+    <!-- ======== 日常待办视图 ======== -->
     <div id="daily-view" class="view active-view">
         <div class="container">
             <h1>日常待办事项</h1>
@@ -46,6 +49,7 @@
         </div>
     </div>
 
+    <!-- ======== 健身训练视图 ======== -->
     <div id="fitness-view" class="view">
         <div class="container">
             <h1>健身训练记录</h1>
@@ -56,9 +60,43 @@
                 <button id="manage-fitness-templates-btn">管理模板</button>
             </div>
             <div id="workout-session"></div>
+            <button id="finish-workout-btn" class="finish-btn">结束并保存训练</button>
+        </div>
+    </div>
+    
+    <!-- ======== 训练分析视图（最终版） ======== -->
+    <div id="analysis-view" class="view">
+        <div class="container">
+            <h1>训练分析</h1>
+            <div class="chart-controls">
+                <label for="chart-type-selector">选择分析图表:</label>
+                <select id="chart-type-selector">
+                    <option value="totalVolume">训练总容量趋势</option>
+                    <option value="exerciseProgress">单项动作进步追踪</option>
+                    <option value="latestWorkout">最近一次训练复盘</option>
+                    <option value="calendar">训练日历热力图</option>
+                </select>
+                <select id="month-selector" style="display:none"></select>
+                <select id="exercise-selector" style="display:none"></select>
+            </div>
+            <div id="chart-display-area">
+                <div class="chart-container" id="line-chart-container">
+                    <canvas id="main-chart"></canvas>
+                </div>
+                <div class="chart-container" id="bar-chart-container" style="display:none;">
+                    <canvas id="bar-chart"></canvas>
+                </div>
+                <div id="calendar-heatmap" class="calendar-heatmap-container" style="display:none;">
+                    <!-- 日历由 JS 动态生成 -->
+                </div>
+            </div>
+            <div id="no-data-message" style="display: none; text-align: center; padding: 20px;">
+                <p>暂无历史训练数据。请先在“健身训练”视图中完成并保存至少一次训练。</p>
+            </div>
         </div>
     </div>
 
+    <!-- ======== 弹窗区域 ======== -->
     <div id="preset-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="close-preset-modal">&times;</span>
@@ -80,7 +118,6 @@
             </div>
         </div>
     </div>
-
     <div id="fitness-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="close-fitness-modal">&times;</span>
@@ -88,6 +125,7 @@
             <div class="modal-body">
                 <div class="template-management">
                     <select id="template-list-selector"></select>
+                    <button id="new-template-btn">新建</button>
                     <button id="edit-template-btn">编辑</button>
                     <button id="delete-template-btn">删除</button>
                 </div>
@@ -105,12 +143,19 @@
 
     <div id="custom-alert-modal" class="modal">
         <div class="modal-content alert-modal-content">
-            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M35 10 h30 v10 h-30 z" /><path d="M30 20 h40 v5 h-40 z" /><path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" /><path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" /></svg>
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <path d="M35 10 h30 v10 h-30 z" />
+                <path d="M30 20 h40 v5 h-40 z" />
+                <path d="M25 25 h50 v60 a10 10 0 0 1 -10 10 h-30 a10 10 0 0 1 -10 -10 v-60 z" />
+                <path class="bolt" d="M45 40 l10 15 h-8 l10 15 l-17 -20 h10 z" />
+            </svg>
             <h2 id="alert-title">能量补充完毕!</h2>
             <p id="alert-message">准备好进行下一组训练！</p>
             <button id="alert-close-btn">继续训练</button>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
